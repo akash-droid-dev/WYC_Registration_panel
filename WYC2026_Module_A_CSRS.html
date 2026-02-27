@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WYC 2026 CSRS - Centralised Sports Repository System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #FFFFFF;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            background: #F9FAFB;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #FFFFFF;
+            border-right: 1px solid #E5E7EB;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 100;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title h1 {
+            color: #111827;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 1rem;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: #BE123C;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card h2 {
+            color: #111827;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .login-card p {
+            color: #6B7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .login-buttons {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-info {
+            background: #F3F4F6;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .demo-info strong {
+            color: #111827;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #BE123C;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: #A00B2A;
+        }
+
+        .btn-secondary {
+            background: #6B7280;
+            color: #FFFFFF;
+        }
+
+        .btn-secondary:hover {
+            background: #4B5563;
+        }
+
+        .btn-success {
+            background: #10B981;
+            color: #FFFFFF;
+        }
+
+        .btn-warning {
+            background: #F59E0B;
+            color: #FFFFFF;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: #FFFFFF;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #BE123C;
+            border: 1px solid #BE123C;
+        }
+
+        .card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            color: #6B7280;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #111827;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+        }
+
+        thead {
+            background: #F9FAFB;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            color: #111827;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+
+        tbody tr:hover {
+            background: #F3F4F6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-approved { background: #D1FAE5; color: #065F46; }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-submitted { background: #DBEAFE; color: #0C4A6E; }
+        .badge-correction { background: #FEE2E2; color: #7F1D1D; }
+        .badge-draft { background: #E5E7EB; color: #374151; }
+
+        .nav-section {
+            padding: 1rem 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .nav-title {
+            padding: 0.75rem 1.5rem;
+            color: #6B7280;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #F9FAFB;
+        }
+
+        .nav-item.active {
+            background: #FEE2E2;
+            color: #BE123C;
+            border-left-color: #BE123C;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #111827;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #BE123C;
+            box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            flex: 1;
+            position: relative;
+        }
+
+        .step-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .step.active .step-number {
+            background: #BE123C;
+            color: #FFFFFF;
+        }
+
+        .step.completed .step-number {
+            background: #10B981;
+            color: #FFFFFF;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: #E5E7EB;
+        }
+
+        .step.completed::after {
+            background: #10B981;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.5rem;
+            height: 250px;
+            padding: 1rem;
+        }
+
+        .bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bar-value {
+            font-weight: 700;
+            color: #111827;
+            font-size: 0.9rem;
+        }
+
+        .bar-fill {
+            width: 100%;
+            border-radius: 0.375rem 0.375rem 0 0;
+            transition: all 0.3s;
+        }
+
+        .bar:hover .bar-fill {
+            opacity: 0.9;
+        }
+
+        .bar-label {
+            font-size: 0.8rem;
+            color: #6B7280;
+            text-align: center;
+            width: 100%;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 60px;
+                height: calc(100vh - 60px);
+                z-index: 99;
+            }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const state = {
+            currentScreen: 'login',
+            userRole: null,
+            sidebarOpen: true,
+            addParticipantStep: 1,
+            selectedForReview: null
+        };
+
+        const demoParticipants = [
+            { id: 1, name: 'Raj Kumar', role: 'Athlete', subRole: 'Male Individual', delegation: 'India', country: 'India', status: 'approved', wyc_id: 'WYC001' },
+            { id: 2, name: 'Priya Singh', role: 'Athlete', subRole: 'Female Group', delegation: 'India', country: 'India', status: 'approved', wyc_id: 'WYC002' },
+            { id: 3, name: 'Tanaka Yuki', role: 'Athlete', subRole: 'Male Individual', delegation: 'Japan', country: 'Japan', status: 'pending', wyc_id: 'WYC003' },
+            { id: 4, name: 'Sarah Johnson', role: 'Support Staff', subRole: 'Physio', delegation: 'USA', country: 'USA', status: 'correction', wyc_id: 'WYC004' },
+            { id: 5, name: 'Marco Silva', role: 'Athlete', subRole: 'Male Group', delegation: 'Brazil', country: 'Brazil', status: 'approved', wyc_id: 'WYC005' },
+            { id: 6, name: 'Felipe Costa', role: 'Athlete', subRole: 'Male Individual', delegation: 'Brazil', country: 'Brazil', status: 'approved', wyc_id: 'WYC006' },
+            { id: 7, name: 'Somchai Thani', role: 'Tech Official', subRole: 'Judging Panel', delegation: 'Thailand', country: 'Thailand', status: 'submitted', wyc_id: 'WYC007' },
+            { id: 8, name: 'Anna Mueller', role: 'Support Staff', subRole: 'Coach', delegation: 'Germany', country: 'Germany', status: 'approved', wyc_id: 'WYC008' },
+            { id: 9, name: 'Lisa Wang', role: 'Athlete', subRole: 'Female Individual', delegation: 'USA', country: 'USA', status: 'approved', wyc_id: 'WYC009' },
+            { id: 10, name: 'Emiko Tanaka', role: 'Support Staff', subRole: 'Doctor', delegation: 'Japan', country: 'Japan', status: 'approved', wyc_id: 'WYC010' },
+            { id: 11, name: 'Deepak Patel', role: 'Athlete', subRole: 'Male Group', delegation: 'India', country: 'India', status: 'draft', wyc_id: 'WYC011' },
+            { id: 12, name: 'Carolina Dias', role: 'Athlete', subRole: 'Female Group', delegation: 'Brazil', country: 'Brazil', status: 'pending', wyc_id: 'WYC012' },
+            { id: 13, name: 'Klaus Wagner', role: 'Tech Official', subRole: 'Coordinator', delegation: 'Germany', country: 'Germany', status: 'approved', wyc_id: 'WYC013' },
+            { id: 14, name: 'Aree Somchai', role: 'Athlete', subRole: 'Female Individual', delegation: 'Thailand', country: 'Thailand', status: 'correction', wyc_id: 'WYC014' },
+            { id: 15, name: 'David Miller', role: 'Support Staff', subRole: 'Trainer', delegation: 'USA', country: 'USA', status: 'approved', wyc_id: 'WYC015' },
+            { id: 16, name: 'Neha Sharma', role: 'Athlete', subRole: 'Female Group', delegation: 'India', country: 'India', status: 'submitted', wyc_id: 'WYC016' },
+            { id: 17, name: 'Hiroshi Yamada', role: 'Athlete', subRole: 'Male Group', delegation: 'Japan', country: 'Japan', status: 'approved', wyc_id: 'WYC017' }
+        ];
+
+        const icons = {
+            award: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8 16 12 20 16 16"></polyline></svg>',
+            home: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+            users: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+            file: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>',
+            barChart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M4 8h12"></path><path d="M4 16h12"></path><path d="M18 8v12"></path></svg>',
+            bell: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>',
+            logout: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>',
+            eye: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+            menu: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>',
+            plus: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+            check: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            x: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+            arrowLeft: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+            download: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>'
+        };
+
+        function getBadgeClass(status) {
+            const classes = {approved: 'badge-approved', pending: 'badge-pending', submitted: 'badge-submitted', correction: 'badge-correction', draft: 'badge-draft'};
+            return classes[status] || 'badge-draft';
+        }
+
+        function getStatusText(status) {
+            const texts = {approved: 'Approved', pending: 'Pending', submitted: 'Submitted', correction: 'Correction Req', draft: 'Draft'};
+            return texts[status] || status;
+        }
+
+        function renderLogin() {
+            return `<div class="login-container"><div class="login-card"><div class="login-logo">${icons.award}</div><h2>World Yogasana Championship 2026</h2><p>Centralised Sports Repository System</p><div class="login-buttons"><button class="btn btn-primary" onclick="loginAs('delegator')">Delegation Login</button><button class="btn btn-secondary" onclick="loginAs('verifier')">Verifier Login</button></div><div class="demo-info"><strong>Demo Credentials:</strong>National: OTP (SMS)<br>International: OTP (Email)<br><strong style="margin-top: 0.5rem;">Verifier: Email OTP</strong></div></div></div>`;
+        }
+
+        function renderDelegationDashboard() {
+            const indiaParticipants = demoParticipants.filter(p => p.delegation === 'India');
+            const approved = indiaParticipants.filter(p => p.status === 'approved').length;
+            const pending = indiaParticipants.filter(p => p.status === 'pending').length;
+            const correction = indiaParticipants.filter(p => p.status === 'correction').length;
+            const draft = indiaParticipants.filter(p => p.status === 'draft').length;
+
+            return `<h2 style="color: #111827; margin-bottom: 1.5rem; font-weight: 700;">Delegation Dashboard</h2><div class="card" style="margin-bottom: 2rem;"><h3 style="color: #111827; margin-bottom: 1rem; font-weight: 600;">Delegation Information</h3><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"><div><strong style="color: #6B7280; font-size: 0.875rem;">Delegation Name</strong><p style="color: #111827; font-weight: 600;">India</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Country</strong><p style="color: #111827; font-weight: 600;">India</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Federation</strong><p style="color: #111827; font-weight: 600;">Indian Yoga Federation</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Contact</strong><p style="color: #111827; font-weight: 600;">contact@iyf.org</p></div></div></div><div class="stats-grid"><div class="stat-card"><div class="stat-label">Total Participants</div><div class="stat-value">${indiaParticipants.length}</div></div><div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color: #10B981;">${approved}</div></div><div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color: #F59E0B;">${pending}</div></div><div class="stat-card"><div class="stat-label">Corrections</div><div class="stat-value" style="color: #EF4444;">${correction}</div></div><div class="stat-card"><div class="stat-label">Draft</div><div class="stat-value" style="color: #6B7280;">${draft}</div></div></div><div class="card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;"><h3 style="color: #111827; font-weight: 600;">Participant Roster</h3><div style="display: flex; gap: 1rem;"><button class="btn btn-primary btn-sm" onclick="navigateTo('addParticipant')"><span style="display: inline-flex; align-items: center; gap: 0.5rem;">${icons.plus} Add Participant</span></button><button class="btn btn-secondary btn-sm">Submit All</button></div></div><table><thead><tr><th>Name</th><th>Role</th><th>Sub-role</th><th>Status</th><th>Actions</th></tr></thead><tbody>${indiaParticipants.map(p => `<tr><td>${p.name}</td><td>${p.role}</td><td>${p.subRole}</td><td><span class="badge ${getBadgeClass(p.status)}">${getStatusText(p.status)}</span></td><td><button class="icon-btn" onclick="navigateTo('editParticipant')">${icons.eye}</button></td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function renderAddParticipant() {
+            const steps = ['Personal Info', 'Role Details', 'Documents', 'Review'];
+            const step = state.addParticipantStep;
+            let stepContent = '';
+            if (step === 1) {
+                stepContent = `<div class="form-group"><label>Full Name</label><input type="text" placeholder="Enter full name"></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;"><div class="form-group"><label>Gender</label><select><option>Select gender</option><option>Male</option><option>Female</option><option>Other</option></select></div><div class="form-group"><label>Date of Birth</label><input type="date"></div></div><div class="form-group"><label>Nationality</label><input type="text" placeholder="India" value="India"></div><div class="form-group"><label>Photo</label><div style="border: 2px dashed #BE123C; border-radius: 0.5rem; padding: 2rem; text-align: center; color: #BE123C; cursor: pointer;">Click to upload or drag and drop<br><span style="font-size: 0.875rem;">PNG, JPG up to 5MB</span></div></div>`;
+            } else if (step === 2) {
+                stepContent = `<div class="form-group"><label>Role</label><select><option>Select role</option><option>Athlete</option><option>Support Staff</option><option>Tech Official</option></select></div><div class="form-group"><label>Sub-role</label><select><option>Select sub-role</option></select></div>`;
+            } else if (step === 3) {
+                stepContent = `<div style="display: grid; gap: 1rem;"><div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F9FAFB; border-radius: 0.5rem;"><span>Photo</span><span style="color: #6B7280;">Pending</span></div><div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F9FAFB; border-radius: 0.5rem;"><span>Government ID</span><button class="btn btn-sm btn-primary">Upload</button></div><div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F9FAFB; border-radius: 0.5rem;"><span>Passport</span><button class="btn btn-sm btn-primary">Upload</button></div><div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F9FAFB; border-radius: 0.5rem;"><span>Medical Certificate</span><button class="btn btn-sm btn-primary">Upload</button></div><div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F9FAFB; border-radius: 0.5rem;"><span>Undertaking</span><button class="btn btn-sm btn-primary">Upload</button></div></div>`;
+            } else if (step === 4) {
+                stepContent = `<div class="card"><h3 style="color: #111827; margin-bottom: 1rem; font-weight: 600;">Review Application</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div><strong style="color: #6B7280; font-size: 0.875rem;">Full Name</strong><p style="color: #111827;">Sample Name</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Gender</strong><p style="color: #111827;">Male</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Date of Birth</strong><p style="color: #111827;">01/01/1990</p></div><div><strong style="color: #6B7280; font-size: 0.875rem;">Role</strong><p style="color: #111827;">Athlete</p></div></div></div>`;
+            }
+            return `<div style="max-width: 600px;"><button class="icon-btn" onclick="navigateTo('delegation')" style="margin-bottom: 1.5rem;"><span style="display: inline-flex; align-items: center; gap: 0.5rem;">${icons.arrowLeft} Back</span></button><h2 style="color: #111827; margin-bottom: 1.5rem; font-weight: 700;">Add Participant</h2><div class="step-indicator">${steps.map((s, i) => `<div class="step ${i + 1 < step ? 'completed' : ''} ${i + 1 === step ? 'active' : ''}"><div class="step-label"><div class="step-number">${i + 1 === step || i + 1 < step ? (i + 1 < step ? 'OK' : i + 1) : i + 1}</div></div></div>`).join('')}</div><div class="card" style="margin-bottom: 2rem;">${stepContent}</div><div style="display: flex; gap: 1rem; justify-content: space-between;">${step > 1 ? `<button class="btn btn-ghost" onclick="previousStep()">Previous</button>` : `<div></div>`}<div style="display: flex; gap: 1rem;"><button class="btn btn-secondary" onclick="navigateTo('delegation')">Save Draft</button>${step < 4 ? `<button class="btn btn-primary" onclick="nextStep()">Next</button>` : `<button class="btn btn-success" onclick="submitParticipant()">Submit</button>`}</div></div></div>`;
+        }
+
+        function renderVerificationQueue() {
+            const pending = demoParticipants.filter(p => p.status === 'pending' || p.status === 'submitted').length;
+            const today = demoParticipants.filter(p => p.status === 'approved').length;
+            return `<h2 style="color: #111827; margin-bottom: 1.5rem; font-weight: 700;">Verification Queue</h2><div class="stats-grid"><div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value">${pending}</div></div><div class="stat-card"><div class="stat-label">Avg Review Time</div><div class="stat-value">2.5h</div></div><div class="stat-card"><div class="stat-label">Approved Today</div><div class="stat-value" style="color: #10B981;">${today}</div></div></div><div class="card"><table><thead><tr><th>App ID</th><th>Name</th><th>Role</th><th>Delegation</th><th>Country</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody>${demoParticipants.map(p => `<tr><td>${p.wyc_id}</td><td>${p.name}</td><td>${p.role}</td><td>${p.delegation}</td><td>${p.country}</td><td>2 days ago</td><td><span class="badge ${getBadgeClass(p.status)}">${getStatusText(p.status)}</span></td><td><button class="icon-btn" onclick="reviewParticipant(${p.id})">${icons.eye}</button></td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function renderVerificationDetail() {
+            const participant = demoParticipants.find(p => p.id === state.selectedForReview);
+            if (!participant) return renderVerificationQueue();
+            return `<button class="icon-btn" onclick="navigateTo('verification')" style="margin-bottom: 1.5rem;"><span style="display: inline-flex; align-items: center; gap: 0.5rem;">${icons.arrowLeft} Back to Queue</span></button><div class="grid-2"><div class="card"><h3 style="color: #111827; margin-bottom: 1rem; font-weight: 600;">Participant Data</h3><div style="display: grid; gap: 1rem; font-size: 0.95rem;"><div><strong style="color: #6B7280;">Name</strong><p style="color: #111827; font-weight: 600;">${participant.name}</p></div><div><strong style="color: #6B7280;">WYC ID</strong><p style="color: #111827; font-weight: 600;">${participant.wyc_id}</p></div><div><strong style="color: #6B7280;">Application ID</strong><p style="color: #111827; font-weight: 600;">APP-${String(participant.id).padStart(4, '0')}</p></div><div><strong style="color: #6B7280;">Role</strong><p style="color: #111827; font-weight: 600;">${participant.role}</p></div><div><strong style="color: #6B7280;">Sub-role</strong><p style="color: #111827; font-weight: 600;">${participant.subRole}</p></div><div><strong style="color: #6B7280;">Delegation</strong><p style="color: #111827; font-weight: 600;">${participant.delegation}</p></div><div><strong style="color: #6B7280;">Country</strong><p style="color: #111827; font-weight: 600;">${participant.country}</p></div><div><strong style="color: #6B7280;">Submitted</strong><p style="color: #111827; font-weight: 600;">2 days ago</p></div></div></div><div><div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #111827; margin-bottom: 1rem; font-weight: 600;">Documents</h3><div style="display: grid; gap: 0.75rem;"><div style="display: flex; justify-content: space-between; align-items: center;"><span>Photo</span><span style="color: #10B981;">${icons.check}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span>Government ID</span><span style="color: #10B981;">${icons.check}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span>Passport</span><span style="color: #EF4444;">${icons.x}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span>Medical Cert</span><span style="color: #10B981;">${icons.check}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span>Undertaking</span><span style="color: #10B981;">${icons.check}</span></div></div></div><div class="card"><h3 style="color: #111827; margin-bottom: 1rem; font-weight: 600;">Verification Action</h3><div class="form-group"><label>Comments</label><textarea placeholder="Add comments or findings..."></textarea></div><div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;"><button class="btn btn-success">Approve</button><button class="btn btn-warning">Request Correction</button><button class="btn btn-danger">Reject</button></div></div></div></div>`;
+        }
+
+        function renderRepository() {
+            return `<h2 style="color: #111827; margin-bottom: 1.5rem; font-weight: 700;">Participant Repository</h2><div class="card"><div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;"><input type="text" placeholder="Search by WYC ID or name..." style="flex: 1;"><button class="btn btn-primary btn-sm">${icons.download} Export</button></div><table><thead><tr><th>WYC ID</th><th>Name</th><th>Role</th><th>Sub-role</th><th>Delegation</th><th>Country</th><th>Status</th></tr></thead><tbody>${demoParticipants.map(p => `<tr><td>${p.wyc_id}</td><td>${p.name}</td><td>${p.role}</td><td>${p.subRole}</td><td>${p.delegation}</td><td>${p.country}</td><td><span class="badge ${getBadgeClass(p.status)}">${getStatusText(p.status)}</span></td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function renderAnalytics() {
+            const statuses = {approved: demoParticipants.filter(p => p.status === 'approved').length, pending: demoParticipants.filter(p => p.status === 'pending').length, submitted: demoParticipants.filter(p => p.status === 'submitted').length, correction: demoParticipants.filter(p => p.status === 'correction').length};
+            const total = demoParticipants.length;
+            const approvalRate = ((statuses.approved / total) * 100).toFixed(1);
+            const statusMax = Math.max(...Object.values(statuses));
+            return `<h2 style="color: #111827; margin-bottom: 1.5rem; font-weight: 700;">Analytics Dashboard</h2><div class="stats-grid"><div class="stat-card"><div class="stat-label">Total Participants</div><div class="stat-value">${total}</div></div><div class="stat-card"><div class="stat-label">Approval Rate</div><div class="stat-value" style="color: #10B981;">${approvalRate}%</div></div><div class="stat-card"><div class="stat-label">Avg Verification Time</div><div class="stat-value">2.5h</div></div><div class="stat-card"><div class="stat-label">Sync Success Rate</div><div class="stat-value" style="color: #10B981;">94%</div></div></div><div class="card" style="margin-bottom: 2rem;"><h3 style="color: #111827; margin-bottom: 1.5rem; font-weight: 600;">Registrations by Status</h3><div class="bar-chart">${Object.entries(statuses).map(([key, value]) => {const colors = {approved: '#10B981', pending: '#F59E0B', submitted: '#3B82F6', correction: '#EF4444'}; const percentage = (value / statusMax) * 100; return `<div class="bar"><div class="bar-value">${value}</div><div class="bar-fill" style="height: ${Math.max(percentage, 10)}%; background: ${colors[key] || '#BE123C'};"></div><div class="bar-label">${key.charAt(0).toUpperCase() + key.slice(1)}</div></div>`;}).join('')}</div></div><div class="card"><h3 style="color: #111827; margin-bottom: 1.5rem; font-weight: 600;">Delegations by Participant Count</h3><table><thead><tr><th>Delegation</th><th>Count</th><th>Percentage</th></tr></thead><tbody><tr><td>India</td><td>4</td><td>23.5%</td></tr><tr><td>Japan</td><td>3</td><td>17.6%</td></tr><tr><td>USA</td><td>3</td><td>17.6%</td></tr><tr><td>Brazil</td><td>3</td><td>17.6%</td></tr><tr><td>Thailand</td><td>2</td><td>11.8%</td></tr><tr><td>Germany</td><td>2</td><td>11.8%</td></tr></tbody></table></div>`;
+        }
+
+        function loginAs(role) {
+            state.userRole = role;
+            state.currentScreen = role === 'delegator' ? 'delegation' : 'verification';
+            renderScreen();
+        }
+
+        function navigateTo(screen) {
+            state.currentScreen = screen;
+            renderScreen();
+        }
+
+        function reviewParticipant(id) {
+            state.selectedForReview = id;
+            state.currentScreen = 'verificationDetail';
+            renderScreen();
+        }
+
+        function nextStep() {
+            if (state.addParticipantStep < 4) {
+                state.addParticipantStep++;
+                renderScreen();
+            }
+        }
+
+        function previousStep() {
+            if (state.addParticipantStep > 1) {
+                state.addParticipantStep--;
+                renderScreen();
+            }
+        }
+
+        function submitParticipant() {
+            state.addParticipantStep = 1;
+            state.currentScreen = 'delegation';
+            renderScreen();
+        }
+
+        function logout() {
+            state.userRole = null;
+            state.currentScreen = 'login';
+            state.addParticipantStep = 1;
+            renderScreen();
+        }
+
+        function toggleSidebar() {
+            state.sidebarOpen = !state.sidebarOpen;
+            renderScreen();
+        }
+
+        function renderScreen() {
+            let content = '';
+            let showSidebar = false;
+            let showHeader = false;
+
+            if (state.currentScreen === 'login') {
+                content = renderLogin();
+            } else {
+                showHeader = true;
+                showSidebar = true;
+                if (state.currentScreen === 'delegation') content = renderDelegationDashboard();
+                else if (state.currentScreen === 'addParticipant') content = renderAddParticipant();
+                else if (state.currentScreen === 'verification') content = renderVerificationQueue();
+                else if (state.currentScreen === 'verificationDetail') content = renderVerificationDetail();
+                else if (state.currentScreen === 'repository') content = renderRepository();
+                else if (state.currentScreen === 'analytics') content = renderAnalytics();
+            }
+
+            let html = '';
+            if (showSidebar && showHeader) {
+                html = `<div class="container"><div class="sidebar ${!state.sidebarOpen ? 'hidden' : ''}"><div style="padding: 1rem 1.5rem;"><h2 style="color: #111827; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">${icons.award} WYC 2026</h2></div>${state.userRole === 'delegator' ? `<div class="nav-section"><div class="nav-title">Delegation</div><div class="nav-item ${state.currentScreen === 'delegation' ? 'active' : ''}" onclick="navigateTo('delegation')">${icons.home} Dashboard</div><div class="nav-item ${state.currentScreen === 'addParticipant' ? 'active' : ''}" onclick="navigateTo('addParticipant')">${icons.plus} Add Participant</div></div>` : `<div class="nav-section"><div class="nav-title">Verification</div><div class="nav-item ${state.currentScreen === 'verification' ? 'active' : ''}" onclick="navigateTo('verification')">${icons.file} Verification Queue</div><div class="nav-item ${state.currentScreen === 'repository' ? 'active' : ''}" onclick="navigateTo('repository')">${icons.users} Repository</div><div class="nav-item ${state.currentScreen === 'analytics' ? 'active' : ''}" onclick="navigateTo('analytics')">${icons.barChart} Analytics</div></div>`}</div><div class="main-content"><div class="header"><div class="header-title"><button class="icon-btn" onclick="toggleSidebar()">${icons.menu}</button><h1>WYC 2026 CSRS</h1></div><div class="header-actions"><button class="icon-btn">${icons.bell}</button><button class="icon-btn" onclick="logout()" title="Logout">${icons.logout}</button></div></div><div class="content">${content}</div></div></div>`;
+            } else {
+                html = content;
+            }
+
+            document.getElementById('app').innerHTML = html;
+        }
+
+        renderScreen();
+    </script>
+</body>
+</html>
